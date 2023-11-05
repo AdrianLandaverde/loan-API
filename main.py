@@ -5,11 +5,11 @@ import google.generativeai as palm
 app = FastAPI()
 
 @app.get("/")
-def root():
+async def root():
     return {"message": "Hello World"}
 
 @app.get("/prediction/")
-def prediction(rating:float,loan:float, down:float, appraised:float, 
+async def prediction(rating:float,loan:float, down:float, appraised:float, 
                 car:float, card:float, student:float, mortage:float, gross:float):
     ltv= (loan-down)/appraised
     dti= (car+card+student+mortage)/gross
@@ -71,5 +71,3 @@ def prediction(rating:float,loan:float, down:float, appraised:float,
         result= "Congratulations, you are eligible for a loan!! \n Here is a link to Fannie Mae's website with more information: https://yourhome.fanniemae.com/buy "
 
     return {"message": message, "result": result}
-
-

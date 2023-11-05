@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 import google.generativeai as palm
+from sklearn.linear_model import LogisticRegression
+import pickle
 
 
 app = FastAPI()
@@ -11,9 +13,31 @@ async def root():
 @app.get("/prediction/")
 async def prediction(rating:float,loan:float, down:float, appraised:float, 
                 car:float, card:float, student:float, mortage:float, gross:float):
+    json_file= {}
+
+    rating= json_file["rating"]
+    loan= json_file["loan"]
+    down= json_file["down"]
+    appraised= json_file["appraised"]
+    car= json_file["car"]
+    card= json_file["card"]
+    student= json_file["student"]
+    mortage= json_file["mortage"]
+    gross= json_file["gross"]
+    
     ltv= (loan-down)/appraised
     dti= (car+card+student+mortage)/gross
     fedti= (mortage)/gross
+
+    model= pickle.load(open("model.pkl", "rb"))
+
+    # Make prediction
+
+    prob= model.predict_proba([[700, .8, .4, .2]])
+    neg_prob= prob[0][0]
+    pos_prob= prob[0][1]
+    neg_prob= round(neg_prob, 2)*100
+    pos_prob= round(pos_prob, 2)*100
 
     if((rating>=640.0) & (ltv<.8) & (dti<=0.43) & (fedti<=0.28)):
         message="Approved"
@@ -70,4 +94,4 @@ async def prediction(rating:float,loan:float, down:float, appraised:float,
 
         result= "Congratulations, you are eligible for a loan!! \n Here is a link to Fannie Mae's website with more information: https://yourhome.fanniemae.com/buy "
 
-    return {"message": message, "result": result}
+    return {"message": message, "result": result, "probability of denial": f"{neg_prob}%", "probability of approval": f"{pos_prob}%"}

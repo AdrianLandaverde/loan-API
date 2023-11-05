@@ -3,11 +3,11 @@ from fastapi import FastAPI
 app = FastAPI()
 
 @app.get("/")
-def root():
+async def root():
     return {"message": "Hello World"}
 
 @app.get("/prediction/")
-def prediction(rating:float,loan:float, down:float, appraised:float, 
+async def prediction(rating:float,loan:float, down:float, appraised:float, 
                 car:float, card:float, student:float, mortage:float, gross:float):
     ltv= (loan-down)/appraised
     dti= (car+card+student+mortage)/gross
